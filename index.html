@@ -1,259 +1,282 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <title>元谋AI剪辑 | 黑科技智能创作平台</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8" />
+<title>元谋AI剪辑 | 黑科技智能创作平台</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
 
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
 
-    body {
-      font-family: 'Orbitron', 'Microsoft YaHei', sans-serif;
-      background: #000;
-      color: #e6f1ff;
-      overflow: hidden;
-      cursor: none;
-    }
+body {
+  font-family: 'Orbitron','Microsoft YaHei',sans-serif;
+  background:#000;
+  color:#e6f1ff;
+  overflow:hidden;
+  cursor:none;
+}
 
-    a, button, .btn { cursor: none !important; }
+/* ===== PC 默认 ===== */
+a,button,.btn { cursor:none; }
 
-    canvas#bg {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-    }
+canvas#bg {
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+}
 
-    /* ===== 自定义鼠标（PC） ===== */
-    .cursor {
-      position: fixed;
-      width: 18px;
-      height: 18px;
-      border: 2px solid #00f6ff;
-      border-radius: 50%;
-      pointer-events: none;
-      transform: translate(-50%, -50%);
-      transition: transform .08s, box-shadow .2s, width .2s, height .2s;
-      box-shadow: 0 0 12px rgba(0,246,255,.8);
-      z-index: 1000;
-    }
+/* ===== 自定义鼠标（仅 PC） ===== */
+.cursor {
+  position:fixed;
+  width:18px;
+  height:18px;
+  border:2px solid #00f6ff;
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  pointer-events:none;
+  box-shadow:0 0 12px rgba(0,246,255,.8);
+  transition:.12s;
+  z-index:1000;
+}
+.cursor.active {
+  width:32px;
+  height:32px;
+  border-color:#8a7dff;
+  box-shadow:0 0 26px rgba(138,125,255,.9);
+}
 
-    .cursor.active {
-      width: 32px;
-      height: 32px;
-      border-color: #8a7dff;
-      box-shadow: 0 0 25px rgba(138,125,255,.9);
-    }
+/* ===== 主体 ===== */
+header {
+  position:relative;
+  z-index:2;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+}
 
-    /* ===== 主内容 ===== */
-    header {
-      position: relative;
-      z-index: 2;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      backdrop-filter: blur(2px);
-    }
+h1 {
+  font-size:4rem;
+  letter-spacing:4px;
+  background:linear-gradient(90deg,#00f6ff,#8a7dff);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:glow 3s infinite alternate;
+}
 
-    h1 {
-      font-size: 4rem;
-      letter-spacing: 4px;
-      background: linear-gradient(90deg,#00f6ff,#8a7dff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: glow 3s infinite alternate;
-    }
+@keyframes glow {
+  from { text-shadow:0 0 10px #00f6ff; }
+  to   { text-shadow:0 0 30px #8a7dff; }
+}
 
-    @keyframes glow {
-      from { text-shadow: 0 0 10px #00f6ff; }
-      to   { text-shadow: 0 0 30px #8a7dff; }
-    }
+.subtitle {
+  margin-top:20px;
+  max-width:720px;
+  font-size:1.1rem;
+  line-height:1.8;
+  color:#b8c7e0;
+}
 
-    .subtitle {
-      margin-top: 20px;
-      max-width: 720px;
-      font-size: 1.1rem;
-      line-height: 1.8;
-      color: #b8c7e0;
-    }
+.btn-group {
+  margin-top:48px;
+  display:flex;
+  gap:24px;
+}
 
-    .btn-group {
-      margin-top: 48px;
-      display: flex;
-      gap: 24px;
-    }
+.btn {
+  padding:14px 36px;
+  border:1px solid #00f6ff;
+  background:rgba(0,246,255,.1);
+  color:#00f6ff;
+  text-decoration:none;
+  border-radius:30px;
+  letter-spacing:2px;
+  transition:.3s;
+}
 
-    .btn {
-      padding: 14px 36px;
-      border: 1px solid #00f6ff;
-      background: rgba(0,246,255,.1);
-      color: #00f6ff;
-      text-decoration: none;
-      border-radius: 30px;
-      letter-spacing: 2px;
-      transition: .3s;
-    }
+.btn:hover {
+  background:#00f6ff;
+  color:#000;
+  box-shadow:0 0 30px #00f6ff;
+}
 
-    .btn:hover {
-      background: #00f6ff;
-      color: #000;
-      box-shadow: 0 0 30px #00f6ff;
-    }
+footer {
+  position:absolute;
+  bottom:20px;
+  font-size:.8rem;
+  color:#6c7a96;
+}
 
-    footer {
-      position: absolute;
-      bottom: 20px;
-      font-size: .8rem;
-      color: #6c7a96;
-    }
+/* ================================================= */
+/* ================= 📱 移动端 ===================== */
+/* ================================================= */
 
-    /* ===== 📱 移动端优化 ===== */
-    @media (max-width: 768px) {
+@media (max-width:768px) {
 
-      body { cursor: auto; }
+  body,
+  a,
+  button,
+  .btn {
+    cursor:auto !important;
+  }
 
-      .cursor { display: none; }
+  .cursor { display:none !important; }
 
-      header {
-        padding: 0 20px;
-        backdrop-filter: none;
-      }
+  header {
+    padding:0 20px;
+  }
 
-      h1 {
-        font-size: 2.2rem;
-        letter-spacing: 2px;
-      }
+  h1 {
+    font-size:2rem;
+    letter-spacing:2px;
+  }
 
-      .subtitle {
-        font-size: .95rem;
-        line-height: 1.6;
-        max-width: 100%;
-        margin-top: 16px;
-      }
+  .subtitle {
+    font-size:.9rem;
+    line-height:1.6;
+    margin-top:14px;
+  }
 
-      .btn-group {
-        flex-direction: column;
-        gap: 14px;
-        margin-top: 32px;
-        width: 100%;
-      }
+  .btn-group {
+    flex-direction:column;
+    gap:14px;
+    margin-top:28px;
+    width:100%;
+  }
 
-      .btn {
-        width: 100%;
-        padding: 14px 0;
-        font-size: .95rem;
-      }
+  .btn {
+    width:100%;
+    padding:14px 0;
+    font-size:.95rem;
+  }
 
-      footer {
-        position: static;
-        margin-top: 32px;
-      }
-    }
-  </style>
+  footer {
+    position:static;
+    margin-top:32px;
+  }
+}
+
+/* ===== 极小屏（真正手机尺寸） ===== */
+@media (max-width:480px) {
+
+  h1 {
+    font-size:1.55rem;
+    letter-spacing:1px;
+  }
+
+  .subtitle {
+    font-size:.82rem;
+    line-height:1.55;
+  }
+}
+</style>
 </head>
 
 <body>
-  <canvas id="bg"></canvas>
-  <div class="cursor" id="cursor"></div>
 
-  <header>
-    <h1>元谋 AI 剪辑</h1>
-    <p class="subtitle">
-      面向未来的智能内容创作平台。<br>
-      多端可用 · 隶属于 <b>元谋科技有限公司</b><br>
-      AI 视频 / 图像生成 + 专业级传统剪辑流程
-    </p>
+<canvas id="bg"></canvas>
+<div class="cursor" id="cursor"></div>
 
-    <div class="btn-group">
-      <a class="btn" href="#">立即下载</a>
-      <a class="btn" href="#">查看文档</a>
-    </div>
+<header>
+  <h1>元谋 AI 剪辑</h1>
 
-    <footer>© 元谋科技有限公司 | YUANMOU TECHNOLOGY</footer>
-  </header>
+  <p class="subtitle">
+    面向未来的智能内容创作平台<br>
+    多端可用 · 元谋科技有限公司<br>
+    AI 视频 / 图像生成 + 专业剪辑流程
+  </p>
 
-  <audio id="bgm" src="https://cdn.pixabay.com/audio/2023/03/30/audio_8f8f9c6b61.mp3" loop></audio>
+  <div class="btn-group">
+    <a class="btn" href="#">立即下载</a>
+    <a class="btn" href="#">查看文档</a>
+  </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+  <footer>© 元谋科技有限公司 | YUANMOU TECHNOLOGY</footer>
+</header>
 
-  <script>
-    const isMobile = window.innerWidth < 768;
+<audio id="bgm" src="https://cdn.pixabay.com/audio/2023/03/30/audio_8f8f9c6b61.mp3" loop></audio>
 
-    /* ===== 鼠标 ===== */
-    const cursor = document.getElementById('cursor');
-    let mouseX = 0, mouseY = 0;
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
 
-    if (!isMobile) {
-      document.addEventListener('mousemove', e => {
-        cursor.style.left = e.clientX + 'px';
-        cursor.style.top  = e.clientY + 'px';
-        mouseX = (e.clientX / innerWidth  - .5) * 2;
-        mouseY = (e.clientY / innerHeight - .5) * 2;
-      });
+<script>
+/* ===== 设备判断（终极正确方式） ===== */
+const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
-      document.querySelectorAll('.btn').forEach(b=>{
-        b.addEventListener('mouseenter',()=>cursor.classList.add('active'));
-        b.addEventListener('mouseleave',()=>cursor.classList.remove('active'));
-      });
-    }
+/* ===== 鼠标（仅 PC） ===== */
+let mouseX = 0, mouseY = 0;
 
-    /* ===== 音乐 ===== */
-    const bgm = document.getElementById('bgm');
-    if (isMobile) bgm.volume = 0.4;
-    document.body.addEventListener('click',()=>{
-      if (bgm.paused) bgm.play();
-    },{ once:true });
+if (!isMobile) {
+  const cursor = document.getElementById('cursor');
 
-    /* ===== Three.js 背景 ===== */
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, innerWidth/innerHeight, 0.1, 1000);
-    camera.position.z = 300;
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top  = e.clientY + 'px';
+    mouseX = (e.clientX / innerWidth  - .5) * 2;
+    mouseY = (e.clientY / innerHeight - .5) * 2;
+  });
 
-    const renderer = new THREE.WebGLRenderer({
-      canvas: document.getElementById('bg'),
-      alpha: true
-    });
+  document.querySelectorAll('.btn').forEach(btn => {
+    btn.addEventListener('mouseenter',()=>cursor.classList.add('active'));
+    btn.addEventListener('mouseleave',()=>cursor.classList.remove('active'));
+  });
+}
 
-    renderer.setSize(innerWidth, innerHeight);
-    renderer.setPixelRatio(isMobile ? Math.min(devicePixelRatio,1.5) : devicePixelRatio);
+/* ===== 音乐 ===== */
+const bgm = document.getElementById('bgm');
+if (isMobile) bgm.volume = 0.4;
+document.body.addEventListener('click',()=>{
+  if (bgm.paused) bgm.play();
+},{ once:true });
 
-    const count = isMobile ? 1200 : 3000;
-    const geometry = new THREE.BufferGeometry();
-    const positions = new Float32Array(count * 3);
+/* ===== Three.js 粒子 ===== */
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, innerWidth/innerHeight, 0.1, 1000);
+camera.position.z = 300;
 
-    for (let i=0;i<positions.length;i++){
-      positions[i]=(Math.random()-.5)*800;
-    }
+const renderer = new THREE.WebGLRenderer({
+  canvas: document.getElementById('bg'),
+  alpha: true
+});
 
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions,3));
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(isMobile ? 1.3 : devicePixelRatio);
 
-    const material = new THREE.PointsMaterial({
-      color: 0x00f6ff,
-      size: 1
-    });
+const count = isMobile ? 900 : 3000;
+const geometry = new THREE.BufferGeometry();
+const positions = new Float32Array(count * 3);
 
-    const points = new THREE.Points(geometry, material);
-    scene.add(points);
+for (let i=0;i<positions.length;i++){
+  positions[i] = (Math.random()-.5)*800;
+}
+geometry.setAttribute('position', new THREE.BufferAttribute(positions,3));
 
-    function animate(){
-      requestAnimationFrame(animate);
-      points.rotation.y += isMobile ? 0.0004 : 0.0008 + mouseX*0.002;
-      points.rotation.x += isMobile ? 0.0002 : 0.0004 + mouseY*0.002;
-      renderer.render(scene,camera);
-    }
-    animate();
+const material = new THREE.PointsMaterial({
+  color: 0x00f6ff,
+  size: 1
+});
 
-    addEventListener('resize',()=>{
-      camera.aspect = innerWidth/innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(innerWidth, innerHeight);
-    });
-  </script>
+const points = new THREE.Points(geometry, material);
+scene.add(points);
+
+function animate(){
+  requestAnimationFrame(animate);
+  points.rotation.y += isMobile ? 0.0003 : 0.0008 + mouseX*0.002;
+  points.rotation.x += isMobile ? 0.00015: 0.0004 + mouseY*0.002;
+  renderer.render(scene,camera);
+}
+animate();
+
+addEventListener('resize',()=>{
+  camera.aspect = innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+
 </body>
 </html>
