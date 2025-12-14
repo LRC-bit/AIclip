@@ -4,9 +4,17 @@
   <meta charset="UTF-8" />
   <title>元谋AI剪辑 | 黑科技智能创作平台</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- 科技字体 -->
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
+
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       font-family: 'Orbitron', 'Microsoft YaHei', sans-serif;
       background: #000;
@@ -15,10 +23,16 @@
       cursor: none;
     }
 
+    a, button, .btn {
+      cursor: none !important;
+    }
+
+    /* Three.js 背景 */
     canvas#bg {
       position: fixed;
       inset: 0;
-      z-index: -1;
+      z-index: 0;
+      pointer-events: none;
     }
 
     /* 自定义鼠标 */
@@ -30,12 +44,26 @@
       border-radius: 50%;
       pointer-events: none;
       transform: translate(-50%, -50%);
-      transition: transform 0.08s ease-out, box-shadow 0.2s;
+      transition: 
+        transform 0.08s ease-out,
+        box-shadow 0.2s,
+        width 0.2s,
+        height 0.2s;
       box-shadow: 0 0 12px rgba(0, 246, 255, 0.8);
       z-index: 1000;
     }
 
+    .cursor.active {
+      width: 32px;
+      height: 32px;
+      border-color: #8a7dff;
+      box-shadow: 0 0 25px rgba(138, 125, 255, 0.9);
+    }
+
+    /* 主内容 */
     header {
+      position: relative;
+      z-index: 2;
       height: 100vh;
       display: flex;
       flex-direction: column;
@@ -56,7 +84,7 @@
 
     @keyframes glow {
       from { text-shadow: 0 0 10px #00f6ff; }
-      to { text-shadow: 0 0 30px #8a7dff; }
+      to   { text-shadow: 0 0 30px #8a7dff; }
     }
 
     .subtitle {
@@ -98,16 +126,22 @@
     }
   </style>
 </head>
+
 <body>
+  <!-- Three.js Canvas -->
   <canvas id="bg"></canvas>
+
+  <!-- 自定义鼠标 -->
   <div class="cursor" id="cursor"></div>
 
+  <!-- 页面内容 -->
   <header>
     <h1>元谋 AI 剪辑</h1>
+
     <p class="subtitle">
       面向未来的智能内容创作平台。<br />
       多端可用 · 隶属于 <b>元谋科技有限公司</b>。<br />
-      集成 AI 视频 / 图像生成与修改能力，
+      集成 AI 视频 / 图像生成与修改能力，<br />
       同时覆盖专业级传统剪辑流程。
     </p>
 
@@ -119,31 +153,54 @@
     <footer>© 元谋科技有限公司 | YUANMOU TECHNOLOGY</footer>
   </header>
 
-  <!-- 音乐（可替换为更赛博的音效） -->
+  <!-- 背景音乐 -->
   <audio id="bgm" src="https://cdn.pixabay.com/audio/2023/03/30/audio_8f8f9c6b61.mp3" loop></audio>
 
-  <!-- Three.js 背景 -->
+  <!-- Three.js -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+
   <script>
-    /* 鼠标 */
+    /* 自定义鼠标 */
     const cursor = document.getElementById('cursor');
+    let mouseX = 0, mouseY = 0;
+
     document.addEventListener('mousemove', e => {
       cursor.style.left = e.clientX + 'px';
-      cursor.style.top = e.clientY + 'px';
+      cursor.style.top  = e.clientY + 'px';
+
+      mouseX = (e.clientX / window.innerWidth  - 0.5) * 2;
+      mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
     });
 
-    /* 音乐交互 */
+    document.querySelectorAll('.btn').forEach(btn => {
+      btn.addEventListener('mouseenter', () => cursor.classList.add('active'));
+      btn.addEventListener('mouseleave', () => cursor.classList.remove('active'));
+    });
+
+    /* 点击播放音乐（解决浏览器限制） */
     const bgm = document.getElementById('bgm');
     document.body.addEventListener('click', () => {
       if (bgm.paused) bgm.play();
     }, { once: true });
 
-    /* Three.js 科技粒子背景 */
+    /* Three.js 粒子背景 */
     const canvas = document.getElementById('bg');
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+
+    const camera = new THREE.PerspectiveCamera(
+      75,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000
+    );
+
+    const renderer = new THREE.WebGLRenderer({
+      canvas,
+      alpha: true
+    });
+
     renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
 
     const geometry = new THREE.BufferGeometry();
     const count = 3000;
@@ -154,7 +211,12 @@
     }
 
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    const material = new THREE.PointsMaterial({ color: 0x00f6ff, size: 1 });
+
+    const material = new THREE.PointsMaterial({
+      color: 0x00f6ff,
+      size: 1
+    });
+
     const points = new THREE.Points(geometry, material);
     scene.add(points);
 
@@ -162,8 +224,8 @@
 
     function animate() {
       requestAnimationFrame(animate);
-      points.rotation.y += 0.0008;
-      points.rotation.x += 0.0004;
+      points.rotation.y += 0.0008 + mouseX * 0.002;
+      points.rotation.x += 0.0004 + mouseY * 0.002;
       renderer.render(scene, camera);
     }
 
