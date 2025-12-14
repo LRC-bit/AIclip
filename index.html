@@ -1,11 +1,179 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-    <meta charset="utf-8">
-    <title>我的 GitHub Pages 网站</title>
+  <meta charset="UTF-8" />
+  <title>元谋AI剪辑 | 黑科技智能创作平台</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Orbitron', 'Microsoft YaHei', sans-serif;
+      background: #000;
+      color: #e6f1ff;
+      overflow: hidden;
+      cursor: none;
+    }
+
+    canvas#bg {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+    }
+
+    /* 自定义鼠标 */
+    .cursor {
+      position: fixed;
+      width: 18px;
+      height: 18px;
+      border: 2px solid #00f6ff;
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      transition: transform 0.08s ease-out, box-shadow 0.2s;
+      box-shadow: 0 0 12px rgba(0, 246, 255, 0.8);
+      z-index: 1000;
+    }
+
+    header {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      backdrop-filter: blur(2px);
+    }
+
+    h1 {
+      font-size: 4rem;
+      letter-spacing: 4px;
+      background: linear-gradient(90deg, #00f6ff, #8a7dff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: glow 3s infinite alternate;
+    }
+
+    @keyframes glow {
+      from { text-shadow: 0 0 10px #00f6ff; }
+      to { text-shadow: 0 0 30px #8a7dff; }
+    }
+
+    .subtitle {
+      margin-top: 20px;
+      max-width: 700px;
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: #b8c7e0;
+    }
+
+    .btn-group {
+      margin-top: 50px;
+      display: flex;
+      gap: 24px;
+    }
+
+    .btn {
+      padding: 14px 36px;
+      border: 1px solid #00f6ff;
+      background: rgba(0, 246, 255, 0.1);
+      color: #00f6ff;
+      text-decoration: none;
+      border-radius: 30px;
+      letter-spacing: 2px;
+      transition: all 0.3s;
+    }
+
+    .btn:hover {
+      background: #00f6ff;
+      color: #000;
+      box-shadow: 0 0 30px #00f6ff;
+    }
+
+    footer {
+      position: absolute;
+      bottom: 20px;
+      font-size: 0.8rem;
+      color: #6c7a96;
+    }
+  </style>
 </head>
 <body>
-    <h1>🎉 恭喜！你的网站上线了！</h1>
-    <p>这是由 GitHub Pages 托管的静态网站。</p>
+  <canvas id="bg"></canvas>
+  <div class="cursor" id="cursor"></div>
+
+  <header>
+    <h1>元谋 AI 剪辑</h1>
+    <p class="subtitle">
+      面向未来的智能内容创作平台。<br />
+      多端可用 · 隶属于 <b>元谋科技有限公司</b>。<br />
+      集成 AI 视频 / 图像生成与修改能力，
+      同时覆盖专业级传统剪辑流程。
+    </p>
+
+    <div class="btn-group">
+      <a class="btn" href="#">立即下载</a>
+      <a class="btn" href="#">查看文档</a>
+    </div>
+
+    <footer>© 元谋科技有限公司 | YUANMOU TECHNOLOGY</footer>
+  </header>
+
+  <!-- 音乐（可替换为更赛博的音效） -->
+  <audio id="bgm" src="https://cdn.pixabay.com/audio/2023/03/30/audio_8f8f9c6b61.mp3" loop></audio>
+
+  <!-- Three.js 背景 -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+  <script>
+    /* 鼠标 */
+    const cursor = document.getElementById('cursor');
+    document.addEventListener('mousemove', e => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+    });
+
+    /* 音乐交互 */
+    const bgm = document.getElementById('bgm');
+    document.body.addEventListener('click', () => {
+      if (bgm.paused) bgm.play();
+    }, { once: true });
+
+    /* Three.js 科技粒子背景 */
+    const canvas = document.getElementById('bg');
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    const geometry = new THREE.BufferGeometry();
+    const count = 3000;
+    const positions = new Float32Array(count * 3);
+
+    for (let i = 0; i < count * 3; i++) {
+      positions[i] = (Math.random() - 0.5) * 800;
+    }
+
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    const material = new THREE.PointsMaterial({ color: 0x00f6ff, size: 1 });
+    const points = new THREE.Points(geometry, material);
+    scene.add(points);
+
+    camera.position.z = 300;
+
+    function animate() {
+      requestAnimationFrame(animate);
+      points.rotation.y += 0.0008;
+      points.rotation.x += 0.0004;
+      renderer.render(scene, camera);
+    }
+
+    animate();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
 </body>
 </html>
